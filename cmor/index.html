@@ -1,0 +1,282 @@
+<html>
+<head>
+<!--link href="https://unpkg.com/tabulator-tables@4.2.7/dist/css/tabulator_modern.min.css" rel="stylesheet"-->
+<!--link href="https://unpkg.com/tabulator-tables@4.2.7/dist/css/tabulator.min.css" rel="stylesheet"-->
+<link href="https://unpkg.com/tabulator-tables@4.4.1/dist/css/bootstrap/tabulator_bootstrap4.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"> </script>
+<script src="https://unpkg.com/github-api/dist/GitHub.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.4.1/dist/js/tabulator.min.js"></script>
+<style>
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{
+	white-space: normal;
+	text-overflow: clip;
+
+}
+.example-table{
+        text-align: center;
+}
+</style>
+
+</head>
+
+<body>
+   <h1 id=myh1> Expert review system for cmorizing LS3MIP </h1>
+
+   <div class="table-controls hidden-xs">
+      <button id="file-load-trigger"> Refresh Table </button>
+      <button onclick="window.location.href = 'models/e3sm.html';">E3SM variable list</button>
+
+
+
+      <select id="mipTypes" class="mySelect">
+         <option value="C4MIP">C4MIP</option>
+         <option value="LUMIP">LUMIP</option>
+         <option value="LS3MIP_E3SM" selected="selected">LS3MIP-E3SM</option>
+      </select>
+
+
+      <select id="mipTable" class="custom-select">
+         <option value="function" selected>Choose..</option>
+         <option value="Amon">Amon</option>
+         <option value="Lmon">Lmon</option>
+         <option value="Emon">Emon</option>
+         <option value="Omon">Omon</option>
+         <option value="LImon">LImon</option>
+      </select>
+
+      <label for="filter">Search:</label>
+      <input type="text" id="filter"/>
+   </div>
+
+
+   <div id="example-table"></div>
+
+   <div> <hr> </div>
+
+   <div>
+      <form action="/" method="POST">
+         <label for="file">Select the JSON file:</label>
+         <input name="file" id="file" type="file" multiple />
+         <label for="commit-title">Commit title (reviewer name: short desc):</label>
+         <input id="commit-title" name="commit-title" type="text" />
+         <input type="submit" value="upload"/>
+      </form>
+   </div>
+
+   <script type="text/javascript" src="dist.js"> </script>
+</body>
+
+
+<script>
+
+    //searching function
+    var input = document.getElementById("filter");
+    input.addEventListener("keyup", function(){
+        var filters = [];
+        var columns = table.getColumns();
+        var search = input.value;
+    
+        columns.forEach(function(column){
+            filters.push({
+                field:column.getField(),
+                type:"like",
+                value:search,
+            });
+        });
+    
+        table.setFilter([filters]);
+    });
+
+
+    // choosing list for amon, lmon etc.
+    //Trigger setFilter function with correct parameters
+    function updateFilter(){
+
+       if($("#mipTable").val() == "function" ){
+          table.clearFilter();
+
+       }else{
+          table.setFilter("miptable","=",$("#mipTable").val());
+       }
+    }
+
+    $("#mipTable").change(updateFilter);
+
+
+    // select
+    var e = document.getElementById("mipTypes");
+    var mip = e.options[e.selectedIndex].value;
+
+    document.title = ("Expert review system for ".concat(mip));
+    document.getElementById("myh1").innerHTML = "Expert review system for ".concat(mip);
+
+    // using proxy to solve cors
+    var myurl="https://cors-anywhere.herokuapp.com/https://comclieco.github.io/cmorjson/".concat(mip).concat(".json");
+
+
+    //Build Tabulator
+    var table = new Tabulator("#example-table", {
+
+       //data loading
+       ajaxURL:myurl,
+       ajaxConfig:{
+            mode:"cors", //set request mode to cors
+            credentials: "same-origin", //send cookies with the request from the matching origin
+            headers: {
+                "Accept": "application/json", //tell the server we need JSON back
+                "X-Requested-With": "XMLHttpRequest", //fix to help some frameworks respond correctly to request
+                "Content-type": 'application/json; charset=utf-8', //set the character encoding of the request
+                "Access-Control-Allow-Origin": "https://portal.nersc.gov", //the URL origin of the site making the request
+            },
+       },
+
+       height:false,
+       layout:"fitColumns",
+
+       //autoColumns:true,
+       //placeholder:"Awaiting Data, Please Load File",
+       footerElement:"<button id='download-json'>Download JSON</button>",
+       //data:data,
+       dataTree:true,
+       //dataTreeStartExpanded:false,
+       dataTreeStartExpanded:function(row, level){
+          return row.getData().confidence; //expand rows where the "driver" data field is true;
+       },
+       pagination:"local",
+       paginationSize:20,
+       groupBy:"miptable",
+       groupToggleElement:"header", //toggle group on click anywhere in the group header
+       downloadConfig:{
+           columnGroups:false, //include column groups in column headers for download
+           rowGroups:false, //do not include row groups in download
+           columnCalcs:false, //do not include column calculation rows in download
+       },
+       columns:[
+          {title:"id", field:"id", width:100},
+          {title:"priority", field:"priority", width:50},
+          {title:"mipTable", field:"miptable", width:100},
+          {title:"long name", field:"longname", width:600, editor:"input"},
+          {title:"varname", field:"cmvar", width:150, editor:"input"},
+          {title:"units", field:"units", width:150, editor:"input"},
+          {title:"mip/model", field:"mip", formatter:"textarea", width:100},
+          {title:"relationship", field:"relationship", width:150, editor:"input"},
+          {title:"confidence", field:"confidence", width:150, editor:"input", formatter:function(cell, formatterParams){
+              var cellValue= cell.getValue();
+              if (cellValue >= 90){
+                 //cell.getRow().getTreeParent().getElement().style.backgroundColor = "#90EE90";
+                 cell.getRow().getElement().style.backgroundColor = "#90EE90";
+                 return cellValue;
+              }
+              else{
+                 //cell.getRow().getElement().style.backgroundColor = "#ADD8E6";
+                 //cell.getRow().getTreeParent().getElement().style.backgroundColor = "#ADD8E6";
+                 return cellValue;
+              }
+          }},
+          {formatter:"buttonCross", width:40, align:"center", cellClick:function(e, cell){
+                 cell.getRow().getElement().style.backgroundColor = "#E8E8E8";
+          }},
+       ],
+
+       //rowFormatter:function(row){
+       //     if(row.getData().priority >= 1){
+       //        row.getElement().addClass("bg-success"); //mark rows with age greater than or equal to 18 as successful;
+       //     }
+       //},
+
+       //rowFormatter:function(row){
+       //   var rowdata = row.getData();
+       //   if(rowdata.id >= 10){
+       //      row.getElement().style.backgroundColor = "#ffbe33";
+       //   }
+       //},
+
+
+
+       initialSort:[
+          {column:"miptable", dir:"asc"}, //sort by this first
+       ],
+       rowClick:function(e, row){
+           //e - the click event object
+           //row - row component
+
+           row.treeToggle(); //collapse the rows children
+           //row.treeExpand();
+
+           row.reformatter();
+
+           var removerows = false;
+           var children=row.getTreeChildren();
+           children.forEach(function(crow, cidx, crows){
+               console.log(crow.getData().confidence);
+               //crow.getElement().style.backgroundColor = "#ADD8E6";
+               if( crow.getData().confidence >= 90){
+                  removerows = true;
+               };
+           });
+
+           console.log(removerows);
+           children.forEach(function(crow, cidx, crows){
+               if( crow.getData().confidence < 90 && removerows ){
+                   console.log('xxx');
+                   console.log(crow.getData().cmvar);
+                   console.dir(crow);
+                   crow.delete();
+               };
+           });
+       },
+   });
+
+   //table.setFilter([
+   //    {field:"confidence", type:">", value:8}, //filter by age greater than 52
+   //]);
+
+   //table.setGroupStartOpen(false);
+
+
+   $("#expand").click(function(){
+     var rows = table.getRows();
+     
+     table.getRows().treeExpand();
+     //for (myrow in rows){
+     //  myrow.treeToggle();
+     //};
+   });
+   
+   //trigger AJAX load on "Load Data via AJAX" button click
+   $("#file-load-trigger").click(function(){
+         table.setData(myurl);
+         location.reload();
+   });
+
+   //trigger AJAX load page without using the browser cache
+   $('.mySelect').change(function () {
+         location.reload();
+   });
+
+   //custom file formatter
+   var fileFormatter = function(columns, data, options, setFileContents){
+       //columns - column definition array for table (with columns in current visible order);
+       //data - currently displayed table data
+       //options - the options object passed from the download function
+       //setFileContents - function to call to pass the formatted data to the downloader
+   
+       //create a list of all name fields
+       var names = [];
+   
+       data.forEach(function(row){
+           names.push(row.name);
+       });
+   
+       //trigger file download, passing the formatted data and mime type
+       setFileContents(names.join(", "), "text/plain");
+   }
+
+   //trigger file download
+   $("#download-json").click(function(){
+       //table.download(fileFormatter, "test.txt");
+       table.download("json", mip.concat(".json"));
+   });
+</script>
+</html>

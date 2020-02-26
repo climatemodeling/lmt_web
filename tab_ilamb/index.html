@@ -1,0 +1,656 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link href="https://unpkg.com/tabulator-tables@4.4.1/dist/css/tabulator_simple.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+
+
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<!--script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.4.3/js/tabulator.min.js"></script-->
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.5.3/dist/js/tabulator.min.js"></script>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.full.min.js"></script>
+<script src="select2.multi-checkboxes.js"></script>
+
+
+<style type="text/css">
+
+#example-table{
+   border-radius: 10px;
+   text-align: left;
+   border-collapse: collapse;
+   border: 2px solid black;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{
+	white-space: nowrap;
+	text-overflow: clip;
+        justify-content: center;
+        font-weight: 600;
+        font-size:12px;
+}
+
+/* whole row*/
+.tabulator-row{
+   border-collapse: collapse;
+   border-bottom: 0.5px solid black;
+   border-top: 0.5px solid black;
+}
+
+.tabulator-row .tabulator-cell{
+   border-right: 0.5px solid black;
+   border-left: 0.5px solid black;
+}
+
+//
+.tabulator-col{
+   border-left: 0.5px solid black;
+   border-right: 0.5px solid black;
+}
+
+/* row and left col*/
+.tabulator-row .tabulator-frozen.tabulator-frozen-left{
+   border-right: 1px solid black;
+   border-left: 1px solid black;
+}
+
+.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left{
+   border-right: 1px solid black;
+   border-left: 1px solid black;
+}
+
+.tabulator .tabulator-header {
+   border-bottom: 0.5px solid black;
+   border-top: 0.5px solid black;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    text-align:center;
+    border-right: 0.5px solid black;
+    border-left: 0.5px solid black;
+}
+
+
+/*column header color*/
+
+.mycolcor1{
+   color: orange;
+}
+
+.mycolcor2{
+   color: orange;
+}
+
+.mycolcor3{
+   color: green;
+}
+
+.mycolcor4{
+   color: blue;
+}
+
+.mycolcor5{
+   color: red;
+}
+//.tabulator-col-title {
+//  -webkit-writing-mode: vertical-rl;
+//  -ms-writing-mode: tb-rl;
+//  writing-mode: vertical-rl;
+//  text-orientation: mixed;
+//  display: -ms-flexbox;
+//  display: flex;
+//  -ms-flex-align: center;
+//  align-items: center;
+//  -ms-flex-pack: center;
+//  justify-content: center;
+//  padding-top: 0px;
+//  padding-bottom: 40px;
+//  padding-right: 0px;
+//  padding-left: 0px;
+//  margin: 0px;
+//  /* if you use rotate change this to paddig-bottom*/
+//  transform: rotate(-180deg);
+//  /* incase of rotation*/
+//}
+
+.tabulator{
+
+}
+
+.tabulator .tabulator-header .tabulator-row .tabulator-cell {
+   height: 28px;
+   border-right-color:"#FFFFFF";
+}
+
+.tabulator-tableHolder{
+   width: 800px;
+}
+
+
+.tabulator .tabulator-row:hover{
+   font-weight:bold;
+   border-bottom: 1.5px solid black;
+   border-top: 1.5px solid black;
+}
+
+div.leftcol{
+   float: left;
+   width: 12%;
+   padding-top: 100px;
+   margin-left: 10px;
+}
+    
+div.mydiv{
+   float: center;
+   max-width: 1200px;
+   min-width: 800px;
+   margin: 0 auto;
+   justify-content: center;
+   padding-top: 100px;
+}
+
+div.tabdiv{
+   float: center;
+   justify-content: center;
+}
+
+.tabulator{
+   font-size: 14px;
+   borderColor: "#FFFFFF";
+}
+
+
+//html css
+table.table-header-rotated {
+    border-collapse: collapse;
+}
+
+td {
+    height: 28px;
+    width: 28px;
+    border: 1px solid;
+}
+
+p {
+font-size:14px
+        font-weight: bold;
+background-color:#FFFFFF;
+}
+
+.myFont{
+font-size:8px;
+}
+
+.select2-results__options{
+font-size:10px;
+}
+
+.select2-selection--single .select2-selection__placeholder {
+font-size:10px;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+   <!--
+   <div class="table-controls">
+   <button id="file-load-trigger"> Open File </button>
+   </div>
+   -->
+
+   <div data-role="page" id="MeanState">  
+
+      <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <h1>ILAMB Benchmarking</h1>
+      </div>
+
+      <form>
+	<fieldset data-role="controlgroup" data-type="horizontal" data-mini="True">
+	  <input type="checkbox" name="colorblind" id="colorblind" onchange="tableColor()">
+	  <label for="colorblind" >Colorblind colors</label>
+	</fieldset>
+      </form>
+
+
+   </div>
+
+   <div>
+        <div class="leftcol">
+         <p> <strong> Hide model list </strong></p>
+          <select class="model-list" id="mlist" name="states[]" multiple="multiple" style="width:75%">
+              <option value="GFDL-CM4"      >GFDL-CM4       </option>      
+              <option value="GFDL-AM4"      >GFDL-AM4       </option>      
+              <option value="CESM2"         >CESM2          </option>         
+              <option value="BCC-CSM2-MR"   >BCC-CSM2-MR    </option>   
+              <option value="BCC-ESM1"      >BCC-ESM1       </option>      
+              <option value="CAMS-CSM1-0"   >CAMS-CSM1-0    </option>   
+              <option value="CESM2-WACCM"   >CESM2-WACCM    </option>   
+              <option value="EC-Earth3-Veg" >EC-Earth3-Veg  </option> 
+              <option value="FGOALS-f3-L"   >FGOALS-f3-L    </option>   
+              <option value="GISS-E2-1-G"   >GISS-E2-1-G    </option>   
+              <option value="IPSL-CM6A-LR"  >IPSL-CM6A-LR   </option>  
+              <option value="MIROC6"        >MIROC6         </option>        
+              <option value="MRI-ESM2-0"    >MRI-ESM2-0     </option>  
+              <option value="SAM0-UNICON"   >SAM0-UNICON    </option>   
+          </select>
+       </div>
+
+       <div class="mydiv">
+       <div id="example-table"></div>
+       </div>
+   </div>
+   <center>
+       <div class="tabdiv">
+       <p>Relative Scale
+       <table class="table-header-rotated" id="scoresLegend">
+         <tbody>
+           <tr>
+             <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+           </tr>
+         </tbody>
+       </table>
+       Worse Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Better Value
+       <table class="table-header-rotated" id="missingLegend">
+         <tbody>
+           <tr>
+             <td bgcolor="#808080"></td>
+           </tr>
+         </tbody>
+       </table>Missing Data or Error
+       </div>
+   </center>
+
+<script>
+
+ //load the options
+       $(document).ready(function() {
+           $('.model-list').select2MultiCheckboxes({
+               placeholder: 'Select an option',
+               theme: "classic",
+               dropdownCssClass: "myFont", 
+               containerCssClass:"myFont",
+               templateSelection: function(data) {
+               return 'Choose to hide';},
+           });
+
+           $('.model-list').val(null).trigger('change');
+
+       });
+
+       //define global variables
+       var PuOr = ['#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788'];
+       var GnRd = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d9f0d3','#a6dba0','#5aae61','#1b7837'];
+       var cmap = GnRd;
+
+       //draw legend
+       var nc = cmap.length;
+       var legtable = document.getElementById("scoresLegend");
+       row = 0;
+       for(var col=0;col<cmap.length;col++){
+          legtable.rows[row].cells[col].style.backgroundColor = cmap[col];
+       }
+</script>
+
+</body>
+
+<script>
+   //Build Tabulator
+       var PuOr = ['#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788'];
+       var GnRd = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d9f0d3','#a6dba0','#5aae61','#1b7837'];
+       var cmap = GnRd;
+
+    var myColorFormatter = function(cell){
+            //console.log(cell.getValue());
+            var clr = "#808080";
+            if(cell.getValue() > -900){
+                var ae = Math.abs(cell.getValue());
+                var ind;
+                if(ae>=0.25){
+                     ind = Math.round(2*cell.getValue()+4);
+                }else{
+                     ind = Math.round(4*cell.getValue()+4);
+                }
+                ind = Math.min(Math.max(ind,0),nc-1);
+                clr = cmap[ind];
+            }
+            cell.getElement().style.backgroundColor = clr;
+            //console.log(clr);
+
+            //return {color:clr};
+    };
+
+
+   function setmetricbg(r, cell, value, bgcolor){
+
+       var r, cell, value, bgcolor;
+       cell.getElement().style.backgroundColor = bgcolor;
+       r.getElement().style.backgroundColor = bgcolor;
+       var gdrow = r.getTreeChildren();
+       if (gdrow.length > 0){
+           gdrow.forEach(function(g){
+               g.getElement().style.backgroundColor = bgcolor;
+               g.getElement().style.color = "#98AFC7";
+           });
+       }
+       return value;
+   };
+
+   var option={
+
+       dataTree:true,
+       dataTreeStartExpanded:[false, false],
+       ajaxURL:"my.json",
+      
+       ajaxConfig:{
+            mode:"cors", //set request mode to cors
+            credentials: "same-origin", //send cookies with the request from the matching origin
+            headers: {
+                "Accept": "application/json", //tell the server we need JSON back
+                "X-Requested-With": "XMLHttpRequest", //fix to help some frameworks respond correctly to request
+                "Content-type": 'application/json; charset=utf-8', //set the character encoding of the request
+                "Access-Control-Allow-Origin": "https://cmorchecker.github.io", //the URL origin of the site making the request
+       },},
+
+
+       movableColumns: true, //enable user movable columns
+       //movableRows: true, //enable user movable columns
+       layout:"fitColumns",
+       //layout:"fitDataFill",
+       //layout:"fitData",
+       groupBy:"scoreboard",
+
+       tooltips: true,
+       //autoColumns:true,
+       columnMinWidth:10,
+
+       //columnVertAlign: "center",
+
+       //groupToggleElement:"header", //toggle group on click anywhere in the group header
+
+
+       columns:[
+          {title:"METRICS/MODELS",  field:"metric", frozen: true, cellClick:function(e, cell){
+                //e - the click event object
+                //cell - cell component
+                var row = cell.getRow(); 
+                var children = row.getTreeChildren();
+
+                //console.log(children);
+                if (children.length == 0){
+                    var topurl="https://www.ilamb.org/CMIP5v6/historical/"
+                    var rowp = row.getTreeParent();
+                    var rowg = rowp.getTreeParent();
+
+                    var cellp = rowp.getCells();
+                    var cellg = rowg.getCells();
+                    //console.log(rowp) 
+                    var headmetric=cellg[0].getValue().replace(/\s/g, '');
+
+                    if ( headmetric != "Relationships" ){
+                       var namemetric=cellp[0].getValue().replace(/\s/g, '');
+                       var name_bench=cell.getValue().replace(/\s/g, '');
+                       console.log(topurl + headmetric + "/" + namemetric + "/" + name_bench + "/" + name_bench + ".html#DataInformation");
+                       //var myurl=topurl + headmetric + "/" + namemetric + "/" + name_bench + "/" + name_bench + ".html#DataInformation";
+                       //var win = window.open(myurl, '_blank');
+                       var myurl=topurl + headmetric + "/" + namemetric + "/" + name_bench + "/" + name_bench + ".html";
+                       //var win = window.open(myurl, '_blank');
+                       var win = window.open(myurl);
+
+                    } else {
+
+                      var namemetric=cellp[0].getValue().replace(/\s/g, '');
+                      var temp = namemetric.split('/');
+
+                      var colp = cellp[0].getColumn();
+                      //console.log(colp.getCells());
+
+                      //all get cells
+                      var colcells = colp.getCells();
+
+                      for (var i=0; i<colcells.length; i++){
+                          //console.log(colcells[i]);
+
+                          //console.log(colcells[i].getRow().getTreeChildren());
+                          // get row
+                          var colrows = colcells[i].getRow();
+
+                          if ( ! colrows.getTreeParent() ){
+                              //console.log(colrows.getCell('metric').getValue());
+                              if (colrows.getCell('metric').getValue() != "Relationships") {
+                                 var rowson = colrows.getTreeChildren();
+                                 for (var j=0; j<rowson.length; j++){
+
+                                    if (temp[0] == rowson[j]._row.data.metric.replace(/\s/g,'')){
+                                        //console.log(temp[0]);
+                                        //console.log(colrows.getCell('metric').getValue());
+                                        var RDheadmetric=colrows.getCell('metric').getValue().replace(/\s/g,'');
+                                        var RDnamemetric=temp[0];
+                                        var RDname_bench=temp[1];
+                                        break;
+                                    }
+
+                                 }
+                              }
+
+                          }
+                          if (typeof RDheadmetric != 'undefined') {
+                              break;
+                          }
+
+                      }
+
+                      if (typeof RDheadmetric != 'undefined') {
+
+                          var myurl=topurl + RDheadmetric + "/" + RDnamemetric + "/" + RDname_bench + "/" + RDname_bench + ".html#Relationships";
+                          var win = window.open(myurl, '_blank');
+                          win.focus();
+                          console.log(RDheadmetric+RDnamemetric);
+                      } else{
+
+                        alert("error");
+
+                      }
+                      //console.log(colp);
+
+                    }
+                    
+                }
+
+                },
+                formatter:function(cell, formatterParams){
+                         var value = cell.getValue();
+
+                         if(! cell.getRow().getTreeParent()){
+                             var chrow = cell.getRow().getTreeChildren();
+                             chrow.forEach(function(r){
+
+                                 switch(value){
+                                   case "Ecosystem and Carbon Cycle":
+                                     setmetricbg(r, cell, value, "#ECFFE6");
+                                     break;
+                                   case "Hydrology Cycle":
+                                     setmetricbg(r, cell, value, "#E6F9FF");
+                                     break;
+                                   case "Radiation and Energy Cycle":
+                                     setmetricbg(r, cell, value, "#FFECE6");
+                                     break;
+                                   case "Forcings":
+                                     setmetricbg(r, cell, value, "#EDEDED");
+                                     break;
+                                   case "Relationships":
+                                     setmetricbg(r, cell, value, "#FFF2E5");
+                                     break;
+                                 }
+                             });
+                         }
+                         return value;
+                   } },
+
+ {title:"bcc-csm1-1"         ,field:"bcc-csm1-1"         ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"CanESM2"            ,field:"CanESM2"            ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"CESM1-BGC"          ,field:"CESM1-BGC"          ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"HadGEM2-ES"         ,field:"HadGEM2-ES"         ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"inmcm4"             ,field:"inmcm4"             ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"IPSL-CM5A-LR"       ,field:"IPSL-CM5A-LR"       ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},  
+ {title:"MIROC-ESM"          ,field:"MIROC-ESM"          ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"MPI-ESM-LR"         ,field:"MPI-ESM-LR"         ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"NorESM1-ME"         ,field:"NorESM1-ME"         ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"BCC-CSM2-MR"        ,field:"BCC-CSM2-MR"        ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"}, 
+ {title:"CanESM5"            ,field:"CanESM5"            ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},
+ {title:"CESM2"              ,field:"CESM2"              ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},
+ {title:"INM-CM5-0"          ,field:"INM-CM5-0"          ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},
+ {title:"IPSL-CM6A-LR"       ,field:"IPSL-CM6A-LR"       ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},  
+ {title:"MIROC-ES2L"         ,field:"MIROC-ES2L"         ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},
+ {title:"MPI-ESM1.2-LR"      ,field:"MPI-ESM1.2-LR"      ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},   
+ {title:"NorESM2-LM"         ,field:"NorESM2-LM"         ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},
+ {title:"UKESM1-0-LL"        ,field:"UKESM1-0-LL"        ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"}, 
+ {title:"MeanCMIP5"          ,field:"MeanCMIP5"          ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor2"},
+ {title:"MeanCMIP6"          ,field:"MeanCMIP6"          ,formatter:myColorFormatter, width:28, headerVertical:"flip", resizable:false, cssClass:"mycolcor4"},
+       ],
+
+       initialSort:[
+            //{column:"scoreboard", dir:"asc"}, //sort by this first
+            //{column:"height", dir:"desc"}, //then sort by this second
+           {column:"metric", dir:"asc"},
+       ],
+
+
+       groupHeader:function(value, count, data, group){
+           //value - the value all members of this group share
+           //count - the number of rows in this group
+           //data - an array of all the row data objects in this group
+           //group - the group component for the group
+           //return value + "<button type='button' onclick='(function(group){group.hide();})'>Click Me!</button>";
+
+           togglescore[group.getKey()]=0;
+
+
+           return value;
+       },
+       
+       //rowFormatter:function(row){
+       //    var data = row.getData(); //get data object for row
+
+       //    //var PuOr = ['#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788'];
+       //    //var GnRd = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d9f0d3','#a6dba0','#5aae61','#1b7837'];
+       //    //var cmap = PuOr;
+       //    // cmap is defined outside so we can change it
+       //    var nc = cmap.length;
+       //    var cells = row.getCells();
+
+       //    for(var col=1;col<cells.length;col++){
+       //        var clr = "#808080";
+       //        if(cells[col].getValue() > -900){
+       //           var ae = Math.abs(cells[col].getValue());
+       //           var ind;
+       //           if(ae>=0.25){
+       //              ind = Math.round(2*cells[col].getValue()+4);
+       //           }else{
+       //              ind = Math.round(4*cells[col].getValue()+4);
+       //           }
+       //           ind = Math.min(Math.max(ind,0),nc-1);
+       //           clr = cmap[ind];
+       //        }
+       //        cells[col].getElement().style.backgroundColor = clr;
+       //    }
+       //},
+
+       groupDblClick:function(e, group){
+       //e - the click event object
+       //group - group component
+
+          //console.log(group.getKey());
+          //console.log(togglescore);
+
+          if(togglescore[group.getKey()] == 0){
+             group.getElement().style.backgroundColor = '#000';
+             group.getElement().style.color = '#fff';
+             var gprows = group.getRows();
+             for (var i=0; i<gprows.length; i++){
+                 gprows[i].treeExpand();
+             }
+             togglescore[group.getKey()]=1;
+           }else{
+             group.getElement().style.backgroundColor = '#fff';
+             group.getElement().style.color = '#000';
+             var gprows = group.getRows();
+             for (var i=0; i<gprows.length; i++){
+                 gprows[i].treeCollapse();
+             }
+             togglescore[group.getKey()]=0;
+           }
+
+           //    //var children = gprows[i].getTreeChildren();
+           //    //for (var j=0; j<children.length; j++){
+           //    //    children[j].treeToggle();
+           //    //}
+           //}
+
+       },};
+
+
+
+    var togglescore={}
+
+
+
+    var table = new Tabulator("#example-table", option); 
+
+
+    function tableColor(){
+
+       //table.destroy();
+
+       if(document.getElementById("colorblind").checked) {
+          cmap = PuOr;
+       }else{
+          cmap = GnRd;
+
+       }
+       table = new Tabulator("#example-table", option); 
+
+        $('.model-list').val(null).trigger('change');
+       var nc = cmap.length;
+       var legtable = document.getElementById("scoresLegend");
+       row = 0;
+       for(var col=0;col<cmap.length;col++){
+          legtable.rows[row].cells[col].style.backgroundColor = cmap[col];
+       }
+
+    }
+
+    $('.model-list').on("select2:select", function (e) {
+    //this returns all the selected item
+    var items= $(this).val();       
+    console.log(items);
+
+    //Gets the last selected item
+    var lastSelectedItem = e.params.data.id;
+    console.log(lastSelectedItem);
+ 
+    table.hideColumn(lastSelectedItem) ////toggle the visibility of the "name" column
+    });
+
+    $('.model-list').on("select2:unselect", function (e) {
+
+    //this returns all the selected item
+    var items= $(this).val();       
+    console.log(items);
+
+    //Gets the last selected item
+    var lastSelectedItem = e.params.data.id;
+    console.log(lastSelectedItem);
+ 
+    table.showColumn(lastSelectedItem) ////toggle the visibility of the "name" column
+    });
+</script>
